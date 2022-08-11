@@ -4,19 +4,22 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
+import { findIndex } from 'rxjs';
 import { NewprojectService } from './newproject.service';
 import { Project } from './project';
 
 
 let names2: string[]
 let paths: string[]
+let descriptions: string[]
+
 @Component({
   selector: 'app-newproject',
   templateUrl: './newproject.component.html',
   styleUrls: ['./newproject.component.css'],
 })
 export class NewProjectComponent implements OnInit {
-  displayedColumns: string[] = ['id', 'ProjectName', 'ProjectPath'];
+  displayedColumns: string[] = [ 'ProjectName','Description' ,'ProjectPath','Action'];
   dataSource!: MatTableDataSource<Project>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator ;
@@ -28,6 +31,7 @@ export class NewProjectComponent implements OnInit {
   projects!:Project[];
   projects2!:any;
   projectForm= new FormGroup({
+
       name: new FormControl('', [Validators.required]),
       description: new FormControl('', [Validators.required]),
       project_path:new FormControl('', [Validators.required])
@@ -37,14 +41,6 @@ export class NewProjectComponent implements OnInit {
   constructor(private newProjectService: NewprojectService,private router:Router,public formBuilder: FormBuilder) {
 
      this.formBuilder.group(this.projectForm)
-
-    // Create 100 users
-  //  const users = Array.from({length: 100}, (_, k) => createNewUser(k + 1));
-
-    // Assign the data to the data source for the table to render
-  //  this.dataSource = new MatTableDataSource(users);
-    //  console.log(users);
-      
 
   }
 
@@ -79,21 +75,16 @@ export class NewProjectComponent implements OnInit {
      names2=this.projects2['name']
      names2=this.projects2.map((x:any)=>x.name)
      paths=this.projects2.map((x:any)=>x.project_path)
+
+     descriptions=this.projects2.map((x:any)=>x.description)
+
      const users = Array.from({length: 100}, (_, k) => createNewUser(k + 1));
     
-     this.dataSource = new MatTableDataSource(users);
-    console.log(users);
+     this.dataSource = new MatTableDataSource(this.projects2);
      this.dataSource.paginator = this.paginator;
 
      this.dataSource.sort = this.sort;
-    // console.log(names2);
-    // console.log(NAMES);
-    // console.log(FRUITS);
-    // console.log(paths);
 
-
-
-     
 
       
     })
@@ -118,27 +109,28 @@ export class NewProjectComponent implements OnInit {
 }
 }
 
-startProject(path:string,_id:string){
-  
+startProject(path:string,id:string,i:number){
+
+    
+ 
   localStorage.setItem('path',path)
-  localStorage.setItem('id_project',_id)
+  localStorage.setItem('id_project',id)
+  console.log( localStorage.getItem('path'));
+  console.log( localStorage.getItem('id_project'));
 
-  this.router.navigate(['/dash/project/upload'])
+ 
+  
+  
+  this.router.navigate(['/dash/project/upload'])}
 }
 
-}
+
 function createNewUser(id: number): Project {
 
-  const ProjectName =
-    names2[Math.round(Math.random() * (names2.length - 1))] +
-    ' ' +
-    names2[Math.round(Math.random() * (names2.length - 1))].charAt(0) +
-    '.';
+return {
 
-  return {
-    id: id.toString(),
-    name: ProjectName,
-  //  ProjectDescription: Math.round(Math.random() * 100).toString(),
+    name: names2[Math.round(Math.random() * (names2.length - 1))],
+    description:descriptions[Math.round(Math.random() * (descriptions.length - 1))],
     project_path: paths[Math.round(Math.random() * (paths.length - 1))]
   };
 }
